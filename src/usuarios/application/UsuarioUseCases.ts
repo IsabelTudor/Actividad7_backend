@@ -26,4 +26,10 @@ export default class UsuarioUseCases{
           throw new Error("Usuario/contraseña no es correcto");
           }
         }
+    async prestar(idEjemplar:number, aliasUsuario:string){
+      return await this.usuarioRepository.prestar(idEjemplar,aliasUsuario);
+    }
+    async devolver(idEjemplar:number,aliasUsuario:string){
+      return await this.usuarioRepository.devolver(idEjemplar,aliasUsuario)
+    }
 }

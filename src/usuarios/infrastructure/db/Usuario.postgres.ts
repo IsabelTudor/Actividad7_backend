@@ -1,6 +1,7 @@
 import Usuario from "../../domain/Usuario";
 import UsuarioRepository from "../../domain/UsuarioRepository";
 import executeQuery from "../../../context/db/postgres.connection"
+import Prestamos from "../../domain/Prestamos";
 
 export default class UsuarioRepositoryPostgres implements UsuarioRepository{
     async registrar(usuario: Usuario): Promise<Usuario | undefined> {
@@ -41,6 +42,19 @@ export default class UsuarioRepositoryPostgres implements UsuarioRepository{
             console.error("No se ha podido logear el usuario");
             return undefined
         }
+    }
+    async prestar(idEjemplar: number, aliasUsuario: string): Promise<Prestamos[] | undefined> {
+        const ejemplarSQL=`select * from ejemplares where id=${idEjemplar}`;
+        const rows:any[]=await executeQuery(ejemplarSQL);
+        if(rows.length===0){
+            throw new Error("No se encuentra ningun ejemplar con este id")
+        }else{
+          
+        }
+        throw new Error("Method not implemented.");
+    }
+    devolver(idEjemplar: number, aliasUsuario: string): Promise<Prestamos[] | undefined> {
+        throw new Error("Method not implemented.");
     }
 
 }
