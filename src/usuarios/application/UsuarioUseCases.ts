@@ -16,20 +16,15 @@ export default class UsuarioUseCases{
         return await this.usuarioRepository.registrar(usuario);
     }
     async logIn(usuario:Usuario){
-        if (!usuario.password) throw new Error("Falta password");
-        const usuarioBD = await this.usuarioRepository.logIn(usuario);
-        if (!usuarioBD) throw new Error("Usuario no encontrado");
-        const iguales = await compare(usuario.password, String(usuarioBD.password));
-        if (iguales) {
-          return usuarioBD;
-        } else {
-          throw new Error("Usuario/contraseña no es correcto");
-          }
+      if (!usuario.password) throw new Error("Falta password");
+      const usuarioBD = await this.usuarioRepository.logIn(usuario);
+      if (!usuarioBD) throw new Error("Usuario no encontrado");
+      const iguales = await compare(usuario.password, String(usuarioBD.password));
+      if (iguales) {
+        return usuarioBD;
+      } else {
+        throw new Error("Usuario/contraseña no es correcto");
         }
-    async prestar(idEjemplar:number, aliasUsuario:string){
-      return await this.usuarioRepository.prestar(idEjemplar,aliasUsuario);
-    }
-    async devolver(idEjemplar:number,aliasUsuario:string){
-      return await this.usuarioRepository.devolver(idEjemplar,aliasUsuario)
-    }
+      }
+    
 }

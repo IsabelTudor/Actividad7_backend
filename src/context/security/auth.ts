@@ -9,7 +9,8 @@ const decode = (token: string) => {
 
 const createToken = (user: Usuario): string => {
   const payload = {
-    user:user.alias
+    user:user.email,
+    nombre:user.nombre
   };
   return jwt.sign(payload, SECRET_KEY, { expiresIn: "1 days" });
 };
@@ -21,6 +22,7 @@ const isAuth = (req: Request, response: Response, next: NextFunction) => {
     if (token) {
       const decoded: any = jwt.verify(token, SECRET_KEY);
       req.body.user=decoded.user
+      req.body.nombre=decoded.nombre
       next();
     } else {
       response.status(401).json({ mensaje: "No autorizado" });
