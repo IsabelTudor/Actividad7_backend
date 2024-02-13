@@ -11,7 +11,7 @@ const createToken = (user: Usuario): string => {
   const payload = {
     user:user.email,
     nombre:user.nombre,
-    apellidos:user.apellidos
+    apellidos:user.apellidos 
   };
   return jwt.sign(payload, SECRET_KEY, { expiresIn: "1 days" });
 };
