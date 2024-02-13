@@ -7,13 +7,10 @@ export default class UsuarioRepositoryPostgres implements UsuarioRepository{
     async registrar(usuario: Usuario): Promise<Usuario | undefined> {
         try{
             const sql =`insert into usuarios (email, password, nombre, apellidos)
-             values ('${usuario.email}', '${usuario.password}','${usuario.nombre}','${usuario.apellidos}')`
+             values ('${usuario.email}', '${usuario.password}','${usuario.nombre}','${usuario.apellidos}') returning *`
              const rows:any[]=await executeQuery(sql);
              const usuarioDB:Usuario={
-                email:rows[0].email,
-                password:rows[0].password,
-                nombre: rows[0].nombre,
-                apellidos: rows[0].apellidos
+                email:rows[0].email
              }
              return usuarioDB
         }catch (error){
@@ -21,8 +18,8 @@ export default class UsuarioRepositoryPostgres implements UsuarioRepository{
         }
     }
     async logIn(usuario: Usuario): Promise<Usuario | undefined> {
-        const {email}=usuario;
         try{
+            const {email}=usuario;
             const sql=`select * from usuarios where email='${email}'`
             const rows:any[]=await executeQuery(sql);
             if(rows.length===0){
@@ -30,15 +27,17 @@ export default class UsuarioRepositoryPostgres implements UsuarioRepository{
             }else{
                 const usuarioDB: Usuario={
                     email:rows[0].email,
-                    nombre: rows[0].nombre
+                    nombre: rows[0].nombre,
+                    apellidos:rows[0].apellidos,
+                    password:rows[0].password
                 }
                 return usuarioDB
-            }
+            } 
         }catch(error){
             console.error("No se ha podido logear el usuario");
             return undefined
-        }
+        
     }
-   
-
 }
+    }
+
