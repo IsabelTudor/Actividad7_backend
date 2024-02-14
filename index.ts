@@ -1,8 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import router from "./src/usuarios/infrastructure/rest/Usuario.rest";
-
+import routerUsuarios from "./src/usuarios/infrastructure/rest/Usuario.rest";
+import routerLibros from "./src/libros/infrastructure/rest/Libro.rest";
 dotenv.config();
 const app = express();
 const port = 8080;
@@ -15,7 +15,8 @@ const options: cors.CorsOptions = {
 app.use(express.json());
 app.use(cors(options));
 
-app.use("/api/usuarios", router)
+app.use("/api/usuarios", routerUsuarios)
+app.use("/api/libros", routerLibros)
 
 
 app.listen(port, () => {
