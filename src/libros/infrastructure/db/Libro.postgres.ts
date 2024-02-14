@@ -1,8 +1,9 @@
 import Libro from "../../domain/Libro";
 import LibroRepository from "../../domain/LibroRepository";
 import executeQuery from "../../../context/db/postgres.connection"
+import Prestamo from "../../domain/Prestamo";
 export default class LibroRepositoryPostgres implements LibroRepository{
-    async getNumPagListables(): Promise<Libro| undefined> {
+   async getNumPagListables(): Promise<Libro| undefined> {
         try{
             const sql=`SELECT count(id)/10 as numPaginas FROM libros`
             const numPaginas=await executeQuery(sql)
@@ -41,6 +42,21 @@ export default class LibroRepositoryPostgres implements LibroRepository{
             return libros;
         }catch (error){
             throw new Error("No se pudo filtar");
+        }
+    }
+    //TIENES QUE REVISARLO NO SE LOGRA INSERTAR EL PRESTAMO
+    async  prestarLibro(idEjemplar: number, usuario: string, fechaprestamo: Date): Promise<Prestamo | undefined> {
+        try{
+            const sql=`insert into prestamos (usuario,ejemplar,fechaprestamo) values ('${usuario}','${idEjemplar}','${fechaprestamo}')`;
+            const prestamoDB: any[] = await executeQuery(sql);
+            const prestamo: Prestamo = {
+                ejemplar: prestamoDB[0].ejemplar,
+                usuario: prestamoDB[0].usuario,
+                fechaprestamo: prestamoDB[0].fechaprestamo
+            }
+        return prestamo;
+        }catch (error){
+            throw new Error("No se pudo prestar el libro");
         }
     }
 }

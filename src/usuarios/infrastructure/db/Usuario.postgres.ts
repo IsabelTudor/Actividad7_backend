@@ -1,7 +1,7 @@
 import Usuario from "../../domain/Usuario";
 import UsuarioRepository from "../../domain/UsuarioRepository";
 import executeQuery from "../../../context/db/postgres.connection"
-import Prestamos from "../../domain/Prestamos";
+
 
 export default class UsuarioRepositoryPostgres implements UsuarioRepository{
     async registrar(usuario: Usuario): Promise<Usuario | undefined> {

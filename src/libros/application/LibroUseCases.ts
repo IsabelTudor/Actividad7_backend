@@ -18,4 +18,7 @@ export default class LibroUseCases{
     async getLibroPorPalabraYPag(palabra:string, idPagina:number){
         return await this.libroRepository.getLibroPorPalabraYPag(palabra,idPagina);
     }
+    async prestarLibro(idEjemplar:number,usuario:string,fechaprestamo:Date){
+        return await this.libroRepository.prestarLibro(idEjemplar,usuario,fechaprestamo)
+    }
 }
