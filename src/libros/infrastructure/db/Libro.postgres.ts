@@ -45,14 +45,16 @@ export default class LibroRepositoryPostgres implements LibroRepository{
         }
     }
     //TIENES QUE REVISARLO NO SE LOGRA INSERTAR EL PRESTAMO
-    async  prestarLibro(idEjemplar: number, usuario: string, fechaprestamo: Date): Promise<Prestamo | undefined> {
+    async prestarLibro(idEjemplar: number, usuario: string, fechaprestamo: Date): Promise<Prestamo | undefined> {
         try{
-            const sql=`insert into prestamos (usuario,ejemplar,fechaprestamo) values ('${usuario}','${idEjemplar}','${fechaprestamo}')`;
+            
+            const sql = `insert into prestamos (usuario,ejemplar,fechaprestamo) values ('${usuario}','${idEjemplar}','${fechaprestamo}') returning *`;           
             const prestamoDB: any[] = await executeQuery(sql);
             const prestamo: Prestamo = {
                 ejemplar: prestamoDB[0].ejemplar,
                 usuario: prestamoDB[0].usuario,
-                fechaprestamo: prestamoDB[0].fechaprestamo
+                fechaprestamo: prestamoDB[0].fechaprestamo,
+                fechadevolucion:prestamoDB[0].fechadevolucion
             }
         return prestamo;
         }catch (error){

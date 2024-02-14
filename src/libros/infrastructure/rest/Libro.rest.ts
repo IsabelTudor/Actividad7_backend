@@ -35,7 +35,7 @@ router.post("/:libro",isAuth,async(req,res)=>{
         const emailUsuario = req.body;
         const idLibro = parseInt(req.params.libro)
         const prestamo = await libroUseCases.prestarLibro(idLibro,emailUsuario,fechaPrestamo)
-        console.log(prestamo);
+        console.log(fechaPrestamo,emailUsuario,idLibro);
         
         res.json(prestamo)
     }catch(error){
