@@ -32,10 +32,15 @@ router.post("/registro", async (req: Request, res: Response) => {
 
     }
 });
-
-
-
-  
-  
+router.put("/registro", isAuth, async (req, res) => {
+  try {
+      const usuario = req.body;
+      const usuarioModificado = await usuarioUseCases.actualizar(usuario);
+      res.json(usuarioModificado);
+  } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
   export default router

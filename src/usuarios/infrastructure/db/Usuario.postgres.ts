@@ -36,8 +36,23 @@ export default class UsuarioRepositoryPostgres implements UsuarioRepository{
         }catch(error){
             console.error("No se ha podido logear el usuario");
             return undefined
+        }
+    }
+    async actualizar(usuarioNuevo: Usuario): Promise<Usuario> {
         
-    }
+        const consulta = `UPDATE usuarios
+        SET  nombre='${usuarioNuevo.nombre}', apellidos='${usuarioNuevo.apellidos}' WHERE email='${usuarioNuevo.email}' returning *;`
+
+        const rows: any[] = await executeQuery(consulta);
+
+        const usuarioBD: Usuario = {
+    
+            email: rows[0].email
+        }
+
+        return usuarioBD;
+    } 
 }
-    }
+    
+
 

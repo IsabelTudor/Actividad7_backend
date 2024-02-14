@@ -9,30 +9,27 @@ const decode = (token: string) => {
 
 const createToken = (user: Usuario): string => {
   const payload = {
-    user:user.email,
-    nombre:user.nombre,
-    apellidos:user.apellidos 
+    user:user.email
   };
   return jwt.sign(payload, SECRET_KEY, { expiresIn: "1 days" });
 };
 
 const isAuth = (req: Request, response: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers["authorization"];
-    const token: string | undefined = authHeader && authHeader.split(" ")[1];
-    if (token) {
-      const decoded: any = jwt.verify(token, SECRET_KEY);
-      req.body.user=decoded.user
-      req.body.nombre=decoded.nombre
-      req.body.apellidos=decoded.apellidos
+      const authHeader = req.headers["authorization"];
+      const token: string | undefined = authHeader && authHeader.split(" ")[1];
       
-      next();
-    } else {
-      response.status(401).json({ mensaje: "No autorizado" });
-    }
+      if (token) {
+          const decoded: any = jwt.verify(token, SECRET_KEY);
+          console.log("Decoded user:", decoded.user);
+          req.body.user = decoded.user;
+          next();
+      } else {
+          response.status(401).json({ mensaje: "No autorizado" });
+      }
   } catch (err) {
-    console.error(err);
-    response.status(401).json({ mensaje: "No autorizado" });
+      console.error("Error during authentication:", err);
+      response.status(401).json({ mensaje: "No autorizado" });
   }
 };
 

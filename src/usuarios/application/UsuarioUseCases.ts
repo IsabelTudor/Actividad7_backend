@@ -26,6 +26,9 @@ export default class UsuarioUseCases{
         throw new Error("Usuario/contraseña no es correcto");
         }
       }
+      async actualizar(usuarioNuevo: Usuario): Promise<Usuario>{
+        return this.usuarioRepository.actualizar(usuarioNuevo);
+    }
     
     
 }
