@@ -44,22 +44,48 @@ export default class LibroRepositoryPostgres implements LibroRepository{
             throw new Error("No se pudo filtar");
         }
     }
-    //TIENES QUE REVISARLO NO SE LOGRA INSERTAR EL PRESTAMO
-    async prestarLibro(idEjemplar: number, usuario: string, fechaprestamo: Date): Promise<Prestamo | undefined> {
+    //TIENES QUE REVISARLO NO SE LOGRA INSERTAR EL PRESTAMO 
+    //Preguntar a sergio
+    async prestarLibro(idEjemplar: number, usuario: String, fechaprestamo: Date): Promise<Prestamo | undefined> {
         try{
-            
-            const sql = `insert into prestamos (usuario,ejemplar,fechaprestamo) values ('${usuario}','${idEjemplar}','${fechaprestamo}') returning *`;           
-            const prestamoDB: any[] = await executeQuery(sql);
-            const prestamo: Prestamo = {
-                ejemplar: prestamoDB[0].ejemplar,
-                usuario: prestamoDB[0].usuario,
-                fechaprestamo: prestamoDB[0].fechaprestamo,
-                fechadevolucion:prestamoDB[0].fechadevolucion
+            const sql=`select count(id) from ejemplares where libro in(select id from libros where disponible='true' and id='${idEjemplar}'  `
+            const hayEjemplares=await executeQuery(sql);
+            if(hayEjemplares<=0){
+               throw new Error("No hay ejemplares disponibles")
+            }else{
+                const sql2 = `INSERT INTO prestamos (usuario, ejemplar, fechaprestamo)
+                VALUES ('${usuario}', ${idEjemplar}, '${fechaprestamo}')
+                RETURNING *;
+                `;
+                const prestamoDB: any[] = await executeQuery(sql2);
+                const prestamo: Prestamo = {
+                    fechaprestamo: prestamoDB[0].fechaprestamo,
+                    usuario: prestamoDB[0].usuario,
+                    ejemplar: prestamoDB[0].ejemplar
+                }
+                const sql3=``
+                return prestamo;
             }
-        return prestamo;
+            
+           
         }catch (error){
             throw new Error("No se pudo prestar el libro");
         }
+    }
+    async verLibrosPrestadosDelUsuario(email:string):Promise<Prestamo[] |undefined>{
+        //tienes que coger el id del ejemplar y buscar el libro con el id del libro
+        try{
+            const sql=`select * from prestamos where usuario='${email}' `
+            const prestamoDB: any[] = await executeQuery(sql);
+                const prestamo: Prestamo = {
+                    fechaprestamo: prestamoDB[0].fechaprestamo,
+                    ejemplar: prestamoDB[0].ejemplar
+                }
+
+        }catch (error){
+            throw new Error("No se pudo mostrar los libros prestados");
+        }
+        return undefined
     }
 }
 

@@ -27,7 +27,7 @@ export default class UsuarioUseCases{
         }
       }
       async actualizar(usuarioNuevo: Usuario): Promise<Usuario>{
-        return this.usuarioRepository.actualizar(usuarioNuevo);
+        return await this.usuarioRepository.actualizar(usuarioNuevo);
     }
     
     

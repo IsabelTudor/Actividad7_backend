@@ -29,18 +29,16 @@ router.get("/:busca/:pagina", async(req,res)=>{
     const libros =await libroUseCases.getLibroPorPalabraYPag(palabraBuscada,parseInt(paginaBuscada));
     res.json(libros)
 })
-router.post("/:libro",isAuth,async(req,res)=>{
+router.post("/:libro", isAuth ,async(req,res)=>{
     try{
         const fechaPrestamo= new Date();
-        const emailUsuario = req.body;
-        const idLibro = parseInt(req.params.libro)
-        const prestamo = await libroUseCases.prestarLibro(idLibro,emailUsuario,fechaPrestamo)
-        console.log(fechaPrestamo,emailUsuario,idLibro);
-        
+        const email = req.body.user;
+        const ejemplar = parseInt(req.params.libro)
+        const prestamo = await libroUseCases.prestarLibro(ejemplar,email,fechaPrestamo)
         res.json(prestamo)
     }catch(error){
         console.error(error);
-        res.status(500).send(error);
+        res.status(500).json({ error: "Internal Server Error" });
     }  
 })
 export default router

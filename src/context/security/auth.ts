@@ -21,6 +21,9 @@ const isAuth = (req: Request, response: Response, next: NextFunction) => {
       
       if (token) {
           const decoded: any = jwt.verify(token, SECRET_KEY);
+          if (!decoded) {
+            throw new Error("Invalid token");
+        }
           console.log("Decoded user:", decoded.user);
           req.body.user = decoded.user;
           next();

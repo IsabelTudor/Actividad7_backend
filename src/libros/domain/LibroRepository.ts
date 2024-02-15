@@ -7,4 +7,5 @@ export default interface LibroRepository{
     getLibroPorPalabraOPag(palabra:string):Promise<Libro|undefined>
     getLibroPorPalabraYPag(palabra:string, idPagina:number):Promise<Libro[]|undefined>
     prestarLibro(idEjemplar:number,usuario:string,fechaprestamo:Date):Promise<Prestamo|undefined>
+    verLibrosPrestadosDelUsuario(email:string):Promise<Prestamo[] |undefined>
 }
