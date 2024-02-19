@@ -2,7 +2,9 @@ import Libro from "../../domain/Libro";
 import LibroRepository from "../../domain/LibroRepository";
 import executeQuery from "../../../context/db/postgres.connection"
 import Prestamo from "../../domain/Prestamo";
+import Ejemplar from "../../domain/Ejemplar";
 export default class LibroRepositoryPostgres implements LibroRepository{
+
    async getNumPagListables(): Promise<Libro| undefined> {
         try{
             const sql=`SELECT count(id)/10 as numPaginas FROM libros`
@@ -44,49 +46,98 @@ export default class LibroRepositoryPostgres implements LibroRepository{
             throw new Error("No se pudo filtar");
         }
     }
-    //TIENES QUE REVISARLO NO SE LOGRA INSERTAR EL PRESTAMO 
-    //Preguntar a sergio
-    async prestarLibro(idEjemplar: number, usuario: String, fechaprestamo: Date): Promise<Prestamo | undefined> {
-        try{
-            const sql=`select count(id) from ejemplares where libro in(select id from libros where disponible='true' and id='${idEjemplar}'  `
-            const hayEjemplares=await executeQuery(sql);
-            if(hayEjemplares<=0){
-               throw new Error("No hay ejemplares disponibles")
-            }else{
-                const sql2 = `INSERT INTO prestamos (usuario, ejemplar, fechaprestamo)
-                VALUES ('${usuario}', ${idEjemplar}, '${fechaprestamo}')
-                RETURNING *;
-                `;
-                const prestamoDB: any[] = await executeQuery(sql2);
-                const prestamo: Prestamo = {
-                    fechaprestamo: prestamoDB[0].fechaprestamo,
-                    usuario: prestamoDB[0].usuario,
-                    ejemplar: prestamoDB[0].ejemplar
-                }
-                const sql3=``
-                return prestamo;
+    
+    async prestarLibro(idEjemplar: number, usuario: String): Promise<Prestamo | undefined> {
+        
+
+        const consulta = `INSERT INTO prestamos(
+            usuario, ejemplar, fechaprestamo)
+            VALUES ('${usuario}', ${idEjemplar}, now()) RETURNING *;`;
+
+        
+        const prestamoDB: any[] = await executeQuery(consulta);
+
+        console.log(prestamoDB);
+        
+            const prestamo: Prestamo = {
+                ejemplar: prestamoDB[0].ejemplar,
+                usuario: prestamoDB[0].usuario,
+                fechaprestamo: prestamoDB[0].fechaprestamo
             }
-            
-           
-        }catch (error){
-            throw new Error("No se pudo prestar el libro");
-        }
+    
+        return prestamo;
+
     }
     async verLibrosPrestadosDelUsuario(email:string):Promise<Prestamo[] |undefined>{
-        //tienes que coger el id del ejemplar y buscar el libro con el id del libro
+        const prestamos : Prestamo[] = []
         try{
-            const sql=`select * from prestamos where usuario='${email}' `
+            const sql = `SELECT
+            prestamos.ejemplar as ejemplar_id,
+            libros.id as libro_id,
+            libros.titulo,
+            libros.autor,
+            prestamos.fechaprestamo
+            from prestamos
+            join ejemplares
+            on prestamos.ejemplar = ejemplares.id
+            join libros
+            on libros.id =ejemplares.libro
+            WHERE
+            prestamos.usuario = '${email}' `
+              
             const prestamoDB: any[] = await executeQuery(sql);
-                const prestamo: Prestamo = {
-                    fechaprestamo: prestamoDB[0].fechaprestamo,
-                    ejemplar: prestamoDB[0].ejemplar
-                }
+            for(const item of prestamoDB){
 
-        }catch (error){
-            throw new Error("No se pudo mostrar los libros prestados");
-        }
-        return undefined
+                const libroPrestado: Libro = {
+                    id: item.libro_id,
+                    titulo: item.titulo,
+                    autor: item.autor,
+                }
+    
+                const ejemplar:Ejemplar = {
+                    id: item.ejemplar_id,
+                    libro:libroPrestado
+                }
+    
+                const prestamo: Prestamo = {
+                    ejemplar: ejemplar,
+                    fechaprestamo: item.fechaprestamo
+                }
+    
+                prestamos.push(prestamo);
+            }
+    
+            return prestamos
+        
+    }catch(error){
+        throw new Error("No se pudo filtar o traer los libros ");
     }
 }
+    async devolverLibro(idEjemplar: number, usuario: string): Promise<Prestamo> {
+        const consulta = `UPDATE prestamos
+        SET fechadevolucion=now()
+        WHERE ejemplar=${idEjemplar} and usuario='${usuario}' RETURNING *;`;
+
+        
+        const prestamoDB: any[] = await executeQuery(consulta);
+
+        console.log(prestamoDB);
+        
+            const prestamo: Prestamo = {
+                ejemplar: prestamoDB[0].ejemplar,
+                usuario: prestamoDB[0].usuario,
+                fechaprestamo: prestamoDB[0].fechaprestamo,
+                fechadevolucion:prestamoDB[0].fechadevolucion
+            }
+    
+        return prestamo;
+
+    }
+        
+}
+
+
+
+
 
 

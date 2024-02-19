@@ -1,9 +1,9 @@
-import express, { Request, Response } from "express";
-import { createToken, isAuth } from "../../../context/security/auth";
+import express from "express";
+import {isAuth } from "../../../context/security/auth";
 import LibroRepository from "../../domain/LibroRepository";
 import LibroRepositoryPostgres from "../db/Libro.postgres";
 import LibroUseCases from "../../application/LibroUseCases";
-import Libro from "../../domain/Libro";
+
 
 const libroRepository:LibroRepository=new LibroRepositoryPostgres()
 const libroUseCases:LibroUseCases=new LibroUseCases(libroRepository);
@@ -31,11 +31,31 @@ router.get("/:busca/:pagina", async(req,res)=>{
 })
 router.post("/:libro", isAuth ,async(req,res)=>{
     try{
-        const fechaPrestamo= new Date();
         const email = req.body.user;
         const ejemplar = parseInt(req.params.libro)
-        const prestamo = await libroUseCases.prestarLibro(ejemplar,email,fechaPrestamo)
+        const prestamo = await libroUseCases.prestarLibro(ejemplar,email)
         res.json(prestamo)
+    }catch(error){
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }  
+})
+router.get("/",isAuth,async(req,res)=>{
+    try{
+        const email=req.body.user;
+        const visualizar=await libroUseCases.verLibrosPrestadosDelUsuario(email);
+        res.json(visualizar)
+    }catch(error){
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }  
+})
+router.put("/:idEjemplar", isAuth,async(req,res)=>{
+    try{
+        const ejemplar=parseInt(req.params.idEjemplar)
+        const email=req.body.user;
+        const visualizar=await libroUseCases.devolverLibro(ejemplar,email);
+        res.json(visualizar)
     }catch(error){
         console.error(error);
         res.status(500).json({ error: "Internal Server Error" });
