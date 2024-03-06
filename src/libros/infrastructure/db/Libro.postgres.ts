@@ -7,9 +7,9 @@ export default class LibroRepositoryPostgres implements LibroRepository{
 
    async getNumPagListables(): Promise<Libro| undefined> {
         try{
-            const sql=`SELECT count(id)/10 as numPaginas FROM libros`
-            const numPaginas=await executeQuery(sql)
-            return numPaginas
+            const sql=`SELECT count(id)/10 as numPags FROM libros`
+            const numPags=await executeQuery(sql)
+            return numPags
         }catch (error){
             throw new Error("No se pudo traer los libros");
         }
