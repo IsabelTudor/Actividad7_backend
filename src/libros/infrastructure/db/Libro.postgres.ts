@@ -125,9 +125,12 @@ export default class LibroRepositoryPostgres implements LibroRepository{
         SET fechadevolucion=now()
         WHERE ejemplar=${idEjemplar} and usuario='${usuario}' RETURNING *;`;
 
-        const query = `update ejemplares set disponible='true' where id=(select id from ejemplares where libro='${idEjemplar}' limit 1)`;
-        const prestamoDB: any[] = await executeQuery(consulta);
+        const query = `UPDATE ejemplares
+        SET disponible='true'
+        WHERE id=${idEjemplar} `;
         await executeQuery(query)
+        const prestamoDB: any[] = await executeQuery(consulta);
+        
         console.log(prestamoDB);
         
             const prestamo: Prestamo = {
