@@ -16,9 +16,13 @@ export default class LibroRepositoryPostgres implements LibroRepository{
     }
     async get10LibrosporPag(idPagina: number): Promise<Libro[] | undefined> {
         try{
-            const sql=`select *, (select count(*) from ejemplares where disponible = 'true' and libro = libros.id) as disponibles
-            from libros
-            limit 10 offset '${idPagina}' * 10`;
+            const sql=`SELECT *, 
+            (SELECT COUNT(*) 
+             FROM ejemplares 
+             WHERE disponible = 'true' AND libro = libros.id) AS disponibles
+     FROM libros
+     ORDER BY autor ASC
+     LIMIT 10 OFFSET '${idPagina}'* 10;`;
             const libros:any[]=await executeQuery(sql);
             return libros
         }catch (error){
